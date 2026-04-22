@@ -1,1 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IB Subject Recommender</title>
 
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    margin: 0;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #333;
+}
+
+/* Container */
+.container {
+    max-width: 750px;
+    margin: 50px auto;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Title */
+h1 {
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Inputs */
+label {
+    margin-top: 12px;
+    display: block;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 10px;
+    border: none;
+    background: #f1f3f6;
+}
+
+/* Button */
+button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ff7eb3, #ff758c);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.03);
+}
+
+/* Output Card */
+.result {
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #fdfbfb, #ebedee);
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+th {
+    background: #667eea;
+    color: white;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+    text-align: center;
+    background: #fff;
+}
+
+tr:nth-child(even) td {
+    background: #f5f7fa;
+}
+
+/* Reason Box */
+.reason {
+    margin-top: 15px;
+    padding: 10px;
+    border-left: 4px solid #667eea;
+    background: #f0f4ff;
+    border-radius: 8px;
+}
+
+/* Error */
+.error {
+    background: #ffe5e5;
+    padding: 10px;
+    border-radius: 10px;
+    color: red;
+    margin-top: 15px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+    <h1>🎓 IB Recommender</h1>
+
+    <label>Career Goal</label>
+    <select id="career">
+        <option value="">Select</option>
+        <option value="Engineering">Engineering</option>
+        <option value="Medicine">Medicine</option>
+        <option value="Business">Business</option>
+        <option value="Arts">Arts</option>
+    </select>
+
+    <label>Math (1–5)</label>
+    <input type="number" id="math" min="1" max="5">
+
+    <label>Science (1–5)</label>
+    <input type="number" id="science" min="1" max="5">
+
+    <label>Language (1–5)</label>
+    <input type="number" id="language" min="1" max="5">
+
+    <button onclick="recommend()">✨ Generate</button>
+
+    <div id="output"></div>
+</div>
+
+<script>
+function recommend() {
+    let career = document.getElementById("career").value;
+    let math = parseInt(document.getElementById("math").value);
+    let science = parseInt(document.getElementById("science").value);
+    let language = parseInt(document.getElementById("language").value);
+
+    let out = document.getElementById("output");
+
+    if (!career || !math || !science || !language) {
+        out.innerHTML = "<div class='error'>⚠️ Fill everything bestie.</div>";
+        return;
+    }
+
+    let HL = [];
+    let SL = [];
+    let reason = [];
+
+    if (career === "Engineering") {
+        HL = ["Math", "Physics"];
+        reason.push("Engineering = Math + Physics combo");
+    }
+    else if (career === "Medicine") {
+        HL = ["Biology", "Chemistry"];
+        reason.push("Medicine = Bio + Chem core");
+    }
+    else if (career === "Business") {
+        HL = ["Economics", "Math"];
+        reason.push("Business needs Econ + Math");
+    }
+    else if (career === "Arts") {
+        HL = ["Visual Arts", "English"];
+        reason.push("Arts = creativity + expression");
+    }
+
+    // third HL
+    if (math >= science && math >= language) {
+        HL.push("Math");
+        reason.push("Math strongest 💪");
+    } else if (science >= math && science >= language) {
+        HL.push("Biology");
+        reason.push("Science strongest 🔬");
+    } else {
+        HL.push("English");
+        reason.push("Language strongest 📝");
+    }
+
+    HL = [...new Set(HL)].slice(0,3);
+
+    SL = ["English", "Language B"];
+    if (!HL.includes("Math")) {
+        SL.push("Math");
+    } else {
+        SL.push("Economics");
+    }
+
+    SL = SL.slice(0,3);
+
+    out.innerHTML = `
+    <div class="result">
+        <h2>🎯 Your Subjects</h2>
+
+        <table>
+            <tr>
+                <th>Level</th>
+                <th>Subjects</th>
+            </tr>
+            <tr>
+                <td>HL 🚀</td>
+                <td>${HL.join(", ")}</td>
+            </tr>
+            <tr>
+                <td>SL 🌿</td>
+                <td>${SL.join(", ")}</td>
+            </tr>
+        </table>
+
+        <div class="reason">
+            <b>Why this works:</b><br>
+            ${reason.join("<br>")}
+        </div>
+    </div>
+    `;
+}
+</script>
+
+</body>
+</html>
